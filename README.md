@@ -1,6 +1,8 @@
 # CRC32
 
-A Racket package providing CRC32 (IEEE 802.3 standard) checksum computation.
+[English](README.md) | [中文](README.zh-CN.md)
+
+CRC32 (IEEE 802.3) checksum implementation for Racket. Computes CRC32 checksums for byte strings, strings in various encodings, and input ports. Also provides a low-level API for incremental computation.
 
 ## Installation
 
@@ -14,35 +16,62 @@ raco pkg install crc32
 #lang racket
 (require crc32)
 
-; Compute CRC32 of byte string
+; Compute CRC32 of a byte string
 (crc32-bytes #"hello world")
 
-; Compute CRC32 of UTF-8 string  
+; Compute CRC32 of a UTF-8 encoded string
 (crc32-string/utf8 "hello world")
 
-; Compute CRC32 from input port
+; Compute CRC32 from an input port
 (crc32-input-port (open-input-file "myfile.txt"))
 ```
 
 ## API
 
-- `crc32-bytes` - Compute CRC32 of byte string
-- `crc32-string/utf8` - Compute CRC32 of UTF-8 encoded string
-- `crc32-string/latin-1` - Compute CRC32 of Latin-1 encoded string  
-- `crc32-string/locale` - Compute CRC32 of locale encoded string
-- `crc32-input-port` - Compute CRC32 from input port
+### High-level API
 
-For incremental computation:
-- `crc32-initial-value` - Initial CRC32 value
-- `crc32-update` - Update CRC32 with single byte
-- `crc32-finalize` - Finalize CRC32 computation
+| Function | Description |
+|----------|-------------|
+| `(crc32-bytes bs)` | Compute CRC32 of a byte string |
+| `(crc32-string/utf8 str)` | Compute CRC32 of a UTF-8 encoded string |
+| `(crc32-string/latin-1 str)` | Compute CRC32 of a Latin-1 encoded string |
+| `(crc32-string/locale str)` | Compute CRC32 of a locale-encoded string |
+| `(crc32-input-port [in])` | Compute CRC32 from an input port |
+
+All functions return an `exact-nonnegative-integer?`.
+
+### Low-level API (Incremental Computation)
+
+```racket
+; Incremental computation
+(define acc crc32-initial-value)
+(set! acc (crc32-update acc 104)) ; 'h'
+(set! acc (crc32-update acc 101)) ; 'e'
+(set! acc (crc32-update acc 108)) ; 'l'
+(set! acc (crc32-update acc 108)) ; 'l'
+(set! acc (crc32-update acc 111)) ; 'o'
+(crc32-finalize acc)
+; => same as (crc32-bytes #"hello")
+```
+
+| Function / Value | Description |
+|------------------|-------------|
+| `crc32-initial-value` | Initial CRC32 accumulator value (`#xFFFFFFFF`) |
+| `(crc32-update acc byte)` | Update accumulator with a single byte |
+| `(crc32-finalize acc)` | Apply final XOR to produce the checksum |
 
 ## Testing
 
 ```bash
-raco test crc32.rkt
+raco test main.rkt
 ```
+
+The test suite covers standard test vectors, boundary cases, repeated patterns, incremental sequences, ASCII strings, UTF-8 strings (including CJK, emoji, Cyrillic, Arabic, and Greek), large data, binary file format headers, incremental computation, and input port functionality.
+
+## Requirements
+
+- Racket 7.0 or later
 
 ## License
 
-MIT
+[MIT](LICENSE)
