@@ -1,5 +1,7 @@
 # CRC32
 
+[![Language](https://img.shields.io/badge/language-Racket-red)] [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 [English](README.md) | [中文](README.zh-CN.md)
 
 CRC32 (IEEE 802.3) checksum implementation for Racket. Computes CRC32 checksums for byte strings, strings in various encodings, and input ports. Also provides a low-level API for incremental computation.
